@@ -1,9 +1,30 @@
 import 'package:flutter/material.dart';
 import 'services/api_service.dart';
 
-
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
+
+  Future<void> _createTeam(BuildContext context) async {
+    ApiService apiService = ApiService();
+
+    // Stel je teamnaam en beschrijving in
+    String teamName = 'Team Alpha'; // Of gebruik je studentnummer
+    String teamDescription = 'Dit is een team';
+
+    final response = await apiService.createTeam(teamName, teamDescription);
+
+    if (context.mounted) {
+      if (response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Team succesvol aangemaakt!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Fout bij het aanmaken van team: ${response.body}')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,31 +42,9 @@ class HomePage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-  onPressed: () async {
-    ApiService apiService = ApiService();
-    Map<String, dynamic> teamData = {
-      'name': 'Nieuw Team', // Voeg hier andere gegevens toe
-    };
-
-    final response = await apiService.createTeam(teamData);
-
-    // Controleer of de widget nog steeds gemonteerd is
-    if (context.mounted) {
-      if (response.statusCode == 201) {
-        // Team succesvol aangemaakt
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Team succesvol aangemaakt!')),
-        );
-      } else {
-        // Foutafhandeling
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Er is een fout opgetreden.')),
-        );
-      }
-    }
-  },
-  child: const Text('Begin met plannen'),
-),
+              onPressed: () => _createTeam(context),
+              child: const Text('Maak Team'),
+            ),
           ],
         ),
       ),
