@@ -35,10 +35,10 @@ class ApiService {
   }
 
   // Methode om een team te verwijderen
-  Future<http.Response> deleteTeam(String teamId) async {
+  Future<http.Response> deleteTeam(int teamId) async {
     final response = await http.delete(
       Uri.parse('${baseUrl}teams/$teamId'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {'Accept': 'application/json'},
     );
     return response;
   }
