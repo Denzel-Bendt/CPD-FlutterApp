@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart'; // Zorg ervoor dat deze import er is
 import 'services/api_service.dart';
 import 'dart:convert';
+import 'teams_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -76,6 +77,16 @@ class HomePageState extends State<HomePage> {
               onPressed: () => _createTeam(context),
               child: const Text('Maak Team'),
             ),
+            ElevatedButton(
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const TeamsPage()),
+    );
+  },
+  child: const Text('Bekijk Teams'),
+),
+
           ],
         ),
       ),
