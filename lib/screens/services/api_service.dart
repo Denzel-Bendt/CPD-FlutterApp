@@ -4,6 +4,19 @@ import 'package:http/http.dart' as http;
 class ApiService {
   final String baseUrl = 'https://team-management-api.dops.tech/api/v1/';
 
+
+
+Future<http.Response> getAllUsers() async {
+    final response = await http.get(
+      Uri.parse('${baseUrl}users'), // Verondersteld endpoint voor alle gebruikers
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    );
+    return response;
+  }
+
   // Methode om een nieuw team aan te maken
   Future<http.Response> createTeam(String name, String description) async {
     Map<String, dynamic> teamData = {

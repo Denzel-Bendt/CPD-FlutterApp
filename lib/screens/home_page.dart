@@ -3,6 +3,7 @@ import 'package:logger/logger.dart'; // Zorg ervoor dat deze import er is
 import 'services/api_service.dart';
 import 'dart:convert';
 import 'teams_page.dart';
+import 'users_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -87,6 +88,15 @@ class HomePageState extends State<HomePage> {
   child: const Text('Bekijk Teams'),
 ),
 
+ElevatedButton(
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const UsersPage()),
+    );
+  },
+  child: const Text('Bekijk Gebruikers'),
+)
           ],
         ),
       ),
