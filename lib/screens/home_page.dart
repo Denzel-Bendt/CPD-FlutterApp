@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart'; // Zorg ervoor dat deze import er is
+import 'package:logger/logger.dart';
 import 'services/api_service.dart';
+import 'services/auth_service.dart'; // Zorg dat AuthService wordt geïmporteerd
 import 'dart:convert';
 import 'teams_page.dart';
 import 'users_page.dart';
+import 'login_screen.dart';
+import 'profile_page.dart'; // Import de ProfilePage
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,7 +16,8 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  final Logger logger = Logger(); // Maak een Logger instantie aan
+  final Logger logger = Logger();
+  final AuthService authService = AuthService(); // Maak een instantie van AuthService
   final TextEditingController _teamNameController = TextEditingController();
   final TextEditingController _teamDescriptionController = TextEditingController();
 
@@ -25,9 +29,8 @@ class HomePageState extends State<HomePage> {
 
     final response = await apiService.createTeam(teamName, teamDescription);
 
-    // Gebruik de logger in plaats van print
-    logger.i('Response status: ${response.statusCode}'); // Informatie loggen
-    logger.i('Response body: ${response.body}'); // Informatie loggen
+    logger.i('Response status: ${response.statusCode}');
+    logger.i('Response body: ${response.body}');
 
     if (context.mounted) {
       if (response.statusCode == 201) {
@@ -50,6 +53,36 @@ class HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('TeamSync'),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'Profile') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                );
+              } else if (value == 'Logout') {
+                // Log de gebruiker uit
+                authService.logout();
+
+                // Navigeren naar het inlogscherm en alle eerdere schermen verwijderen
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (Route<dynamic> route) => false,
+                );
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return {'Profile', 'Logout'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+            icon: const Icon(Icons.account_circle),
+          ),
+        ],
       ),
       body: Center(
         child: Column(
@@ -79,24 +112,23 @@ class HomePageState extends State<HomePage> {
               child: const Text('Maak Team'),
             ),
             ElevatedButton(
-  onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const TeamsPage()),
-    );
-  },
-  child: const Text('Bekijk Teams'),
-),
-
-ElevatedButton(
-  onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const UsersPage()),
-    );
-  },
-  child: const Text('Bekijk Gebruikers'),
-)
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const TeamsPage()),
+                );
+              },
+              child: const Text('Bekijk Teams'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const UsersPage()),
+                );
+              },
+              child: const Text('Bekijk Gebruikers'),
+            ),
           ],
         ),
       ),

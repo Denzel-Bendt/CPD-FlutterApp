@@ -5,6 +5,7 @@ import 'package:logger/logger.dart';
 class AuthService {
   final String baseUrl = 'https://team-management-api.dops.tech/api/v2';
   final Logger _logger = Logger();
+  static String? authToken;
 
   // Methode om een nieuwe gebruiker te registreren
   Future<bool> registerUser(String name, String password) async {
@@ -38,6 +39,8 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        authToken = responseData['data']['token'];
         _logger.i('Inloggen succesvol voor gebruiker: $name');
         return true;
       } else {
@@ -50,14 +53,20 @@ class AuthService {
     }
   }
 
+  // Methode om uit te loggen
+  void logout() {
+    authToken = null;
+    _logger.i('Gebruiker is uitgelogd');
+  }
+
   // Methode om alle gebruikers op te halen
   Future<void> getAllUsers() async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/users'), // Zorg dat /users het juiste endpoint is
+        Uri.parse('$baseUrl/users'),
         headers: {
           'Content-Type': 'application/json',
-          // Voeg 'Authorization': 'Bearer <je-token>' toe als authenticatie vereist is
+          if (authToken != null) 'Authorization': 'Bearer $authToken',
         },
       );
 
