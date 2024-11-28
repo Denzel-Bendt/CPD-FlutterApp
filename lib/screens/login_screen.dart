@@ -19,8 +19,30 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Login/Registratie"),
+      backgroundColor: Colors.white70,
+      appBar: PreferredSize(
+        preferredSize:
+            const Size.fromHeight(60.0), // Set the height of the AppBar
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: const Color.fromARGB(255, 0, 0, 0), // Border color
+              width: 4.0, // Border thickness
+            ),
+            borderRadius: BorderRadius.vertical(
+                bottom: Radius.circular(10)), // Optional: Rounded corners
+          ),
+          child: AppBar(
+            backgroundColor: Colors.grey, // Set background color of AppBar
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text("Flutter App"),
+              ],
+            ),
+            elevation: 0, // Remove shadow
+          ),
+        ),
       ),
       body: Center(
         child: Padding(
@@ -28,46 +50,115 @@ class LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              TextField(
+              Padding(
+                padding: const EdgeInsets.only(bottom: 100.0),
+                child: const Text(
+                  'Login Pagina', // Your H1 text
+                  style: TextStyle(
+                    fontSize: 36, // H1 font size
+                    fontWeight: FontWeight.w300, // Bold text
+                    color: Colors.black, // Text color
+                  ),
+                  textAlign: TextAlign.center, // Center the text
+                ),
+              ),
+              SizedBox(
+                width: 300,
+                child: TextField(
                 controller: _usernameController,
-                decoration: InputDecoration(labelText: 'Gebruikersnaam'),
+                  decoration: InputDecoration(
+                    labelText: 'Gebruikersnaam',
+                    border: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(20.0), // Rounded corners
+                      borderSide: BorderSide(
+                        color: Colors.black, // Border color
+                        width: 1.0, // Border thickness
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(10.0), // Rounded corners
+                      borderSide: BorderSide(
+                        color: Colors.black, // Border color when focused
+                        width: 1.0, // Border thickness when focused
+                      ),
+                    ),
+                  ),
+                ),
               ),
-              TextField(
-  controller: _passwordController,
-  decoration: InputDecoration(
-    labelText: 'Wachtwoord'
-  ),
-  obscureText: true,  // Verbergt de tekst die wordt ingevoerd
-
+              SizedBox(height: 70), // Margin of 35 pixels between fields
+              SizedBox(
+                width: 300,
+                child: TextField(
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Wachtwoord',
+                    // Here you define the border for the TextField
+                    border: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(20.0), // Rounded corners
+                      borderSide: BorderSide(
+                        color: Colors.black, // Border color
+                        width: 1.0, // Border thickness
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(10.0), // Rounded corners
+                      borderSide: BorderSide(
+                        color: Colors.black, // Border color when focused
+                        width: 1.0, // Border thickness when focused
+                      ),
+                    ),
+                    // obscureText: true,// dit geeft een error // Verbergt de tekst die wordt ingevoerd
+                  ),
+                ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
-                  bool registered = await _authService.registerUser(_usernameController.text, _passwordController.text);
+                  bool registered = await _authService.registerUser(
+                      _usernameController.text, _passwordController.text);
                   if (registered) {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const HomePage()));
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Registratie mislukt'))
-                    );
+                        const SnackBar(content: Text('Registratie mislukt')));
                   }
                 },
-                child: Text('Register'),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor:
+                      const Color.fromARGB(255, 143, 147, 150), // Text color
+                ),
+                child: const Text('Register'),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
-                  bool loggedIn = await _authService.loginUser(_usernameController.text, _passwordController.text);
+                  bool loggedIn = await _authService.loginUser(
+                      _usernameController.text, _passwordController.text);
                   if (loggedIn) {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const HomePage()));
                   } else {
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Inloggen mislukt'))
-                      );
+                          const SnackBar(content: Text('Inloggen mislukt')));
                     }
                   }
                 },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor:
+                      const Color.fromARGB(255, 143, 147, 150), // Text color
+                ),
                 child: const Text('Login'),
               ),
             ],
