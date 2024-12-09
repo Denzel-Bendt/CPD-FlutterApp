@@ -1,8 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'services/auth_service.dart'; // Verifieer het pad
-import 'home_page.dart';
+import 'package:cpd_flutterapp/services/auth_service.dart';
+import 'package:cpd_flutterapp/screens/home_page.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key}); // Using super.key instead of Key? key
@@ -29,7 +29,7 @@ class LoginScreenState extends State<LoginScreen> {
               color: const Color.fromARGB(255, 0, 0, 0), // Border color
               width: 4.0, // Border thickness
             ),
-            borderRadius: BorderRadius.vertical(
+            borderRadius: const BorderRadius.vertical(
                 bottom: Radius.circular(10)), // Optional: Rounded corners
           ),
           child: AppBar(
@@ -50,9 +50,9 @@ class LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(bottom: 100.0),
-                child: const Text(
+              const Padding(
+                padding: EdgeInsets.only(bottom: 100.0),
+                child: Text(
                   'Login Pagina', // Your H1 text
                   style: TextStyle(
                     fontSize: 36, // H1 font size
@@ -65,13 +65,13 @@ class LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 width: 300,
                 child: TextField(
-                controller: _usernameController,
+                  controller: _usernameController,
                   decoration: InputDecoration(
                     labelText: 'Gebruikersnaam',
                     border: OutlineInputBorder(
                       borderRadius:
                           BorderRadius.circular(20.0), // Rounded corners
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         color: Colors.black, // Border color
                         width: 1.0, // Border thickness
                       ),
@@ -79,7 +79,7 @@ class LoginScreenState extends State<LoginScreen> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius:
                           BorderRadius.circular(10.0), // Rounded corners
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         color: Colors.black, // Border color when focused
                         width: 1.0, // Border thickness when focused
                       ),
@@ -87,18 +87,17 @@ class LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 70), // Margin of 35 pixels between fields
+              const SizedBox(height: 70), // Margin of 35 pixels between fields
               SizedBox(
                 width: 300,
                 child: TextField(
                   controller: _passwordController,
                   decoration: InputDecoration(
                     labelText: 'Wachtwoord',
-                    // Here you define the border for the TextField
                     border: OutlineInputBorder(
                       borderRadius:
                           BorderRadius.circular(20.0), // Rounded corners
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         color: Colors.black, // Border color
                         width: 1.0, // Border thickness
                       ),
@@ -106,13 +105,13 @@ class LoginScreenState extends State<LoginScreen> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius:
                           BorderRadius.circular(10.0), // Rounded corners
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         color: Colors.black, // Border color when focused
                         width: 1.0, // Border thickness when focused
                       ),
                     ),
-                    // obscureText: true,// dit geeft een error // Verbergt de tekst die wordt ingevoerd
                   ),
+                  obscureText: true, // Verbergt de tekst die wordt ingevoerd
                 ),
               ),
               const SizedBox(height: 20),
@@ -122,9 +121,11 @@ class LoginScreenState extends State<LoginScreen> {
                       _usernameController.text, _passwordController.text);
                   if (registered) {
                     Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomePage()));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomePage(teamId: 1), // Pas teamId aan indien nodig
+                      ),
+                    );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Registratie mislukt')));
@@ -144,9 +145,11 @@ class LoginScreenState extends State<LoginScreen> {
                       _usernameController.text, _passwordController.text);
                   if (loggedIn) {
                     Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomePage()));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomePage(teamId: 1), // Pas teamId aan indien nodig
+                      ),
+                    );
                   } else {
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
