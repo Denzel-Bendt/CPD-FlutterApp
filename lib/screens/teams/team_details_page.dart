@@ -16,6 +16,8 @@ class TeamDetailsPageState extends State<TeamDetailsPage> {
   final TextEditingController _userIdController = TextEditingController();
   bool isLoading = true;
 
+  bool isAdmin = true; // Hier controleren of de huidige gebruiker een admin is
+
   @override
   void initState() {
     super.initState();
@@ -28,7 +30,8 @@ class TeamDetailsPageState extends State<TeamDetailsPage> {
     });
 
     try {
-      final Map<String, dynamic>? response = await apiService.getTeamDetails(widget.teamId);
+      final Map<String, dynamic>? response =
+          await apiService.getTeamDetails(widget.teamId);
 
       if (!mounted) return;
 
@@ -80,13 +83,13 @@ class TeamDetailsPageState extends State<TeamDetailsPage> {
     try {
       final response = await apiService.addUserToTeam(widget.teamId, userId);
 
-      if (!mounted) return; // Controleer of de widget nog bestaat
+      if (!mounted) return;
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Gebruiker toegevoegd aan team!')),
         );
-        await _fetchTeamDetails(); // Herlaad teamdetails
+        await _fetchTeamDetails();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Fout bij toevoegen gebruiker: ${response.body}')),
@@ -99,6 +102,55 @@ class TeamDetailsPageState extends State<TeamDetailsPage> {
         );
       }
     }
+  }
+
+ Future<void> _removeUserFromTeam(int userId) async {
+  try {
+    final response = await apiService.removeUserFromTeam(widget.teamId, userId);
+
+    if (!mounted) return; // Controleer of de widget nog actief is
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gebruiker succesvol verwijderd!')),
+      );
+      await _fetchTeamDetails(); // Herlaad teamdetails
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Fout: ${response.body}')),
+      );
+    }
+  } catch (e) {
+    if (mounted) { // Controleer opnieuw of de widget nog actief is
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Er is een fout opgetreden: $e')),
+      );
+    }
+  }
+}
+
+
+  Widget _buildUserList() {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: (teamDetails!['members'] as List).length,
+      itemBuilder: (context, index) {
+        final member = (teamDetails!['members'] as List)[index];
+        return ListTile(
+          title: Text(member['name']),
+          subtitle: Text('ID: ${member['id']}'),
+          trailing: isAdmin
+              ? IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () async {
+                    await _removeUserFromTeam(member['id']);
+                  },
+                )
+              : null,
+        );
+      },
+    );
   }
 
   @override
@@ -114,28 +166,16 @@ class TeamDetailsPageState extends State<TeamDetailsPage> {
                   'Teamnaam: ${teamDetails?['name'] ?? 'Onbekend'}',
                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                Text('Beschrijving: ${teamDetails?['description'] ?? 'Geen beschrijving'}'),
+                Text(
+                    'Beschrijving: ${teamDetails?['description'] ?? 'Geen beschrijving'}'),
                 const Divider(),
                 const Text('Leden:'),
-                if (teamDetails?['members'] != null)
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: (teamDetails!['members'] as List).length,
-                    itemBuilder: (context, index) {
-                      final member = (teamDetails!['members'] as List)[index];
-                      return ListTile(
-                        title: Text(member['name']),
-                        subtitle: Text('ID: ${member['id']}'),
-                      );
-                    },
-                  )
-                else
-                  const Text('Geen leden beschikbaar.'),
+                if (teamDetails?['members'] != null) _buildUserList() else const Text('Geen leden beschikbaar.'),
                 const SizedBox(height: 20),
                 TextField(
                   controller: _userIdController,
-                  decoration: const InputDecoration(labelText: 'Voer Gebruiker ID in'),
+                  decoration:
+                      const InputDecoration(labelText: 'Voer Gebruiker ID in'),
                   keyboardType: TextInputType.number,
                 ),
                 ElevatedButton(

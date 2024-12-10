@@ -1,39 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
-import 'package:cpd_flutterapp/services/auth_service.dart';
+import 'auth_service.dart';
 
 class ApiService {
   final String baseUrl = 'https://team-management-api.dops.tech/api/v2/';
   final Logger _logger = Logger();
 
-  // Haal alle gebruikers op
-  Future<http.Response> getAllUsers() async {
-    try {
-      final response = await http.get(
-        Uri.parse('${baseUrl}users'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          if (AuthService.authToken != null)
-            'Authorization': 'Bearer ${AuthService.authToken}',
-        },
-      );
-
-      _logger.i('Gebruikersresponse: ${response.body}');
-      if (response.statusCode == 200) {
-        _logger.i('Gebruikers succesvol opgehaald: ${response.body}');
-      } else {
-        _logger.w('Fout bij het ophalen van gebruikers: ${response.body}');
-      }
-      return response;
-    } catch (e) {
-      _logger.e('Er is een fout opgetreden bij het ophalen van gebruikers: $e');
-      rethrow;
-    }
-  }
-
-  // Haal teamdetails op inclusief leden
+  // Methode om teamdetails op te halen
   Future<Map<String, dynamic>?> getTeamDetails(int teamId) async {
     try {
       final response = await http.get(
@@ -53,68 +27,78 @@ class ApiService {
         return null;
       }
     } catch (e) {
-      _logger.e('Fout bij het ophalen van teamdetails: $e');
+      _logger.e('Fout bij ophalen teamdetails: $e');
       rethrow;
     }
   }
 
-  // Voeg een gebruiker toe aan een team
-Future<http.Response> addUserToTeam(int teamId, int userId) async {
-  try {
-    final response = await http.post(
-      Uri.parse('${baseUrl}teams/$teamId/addUser'), // Zorgt voor correcte URI
-      headers: {
-        'Content-Type': 'application/json',
-        if (AuthService.authToken != null)
-          'Authorization': 'Bearer ${AuthService.authToken}', // Token toegevoegd
-      },
-      body: json.encode({'userId': userId}),
-    );
+  // Methode om een gebruiker toe te voegen aan een team
+  Future<http.Response> addUserToTeam(int teamId, int userId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${baseUrl}teams/$teamId/addUser'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (AuthService.authToken != null)
+            'Authorization': 'Bearer ${AuthService.authToken}',
+        },
+        body: json.encode({'userId': userId}),
+      );
 
-    // Debug-informatie
-    _logger.i('Request URL: ${Uri.parse('${baseUrl}teams/$teamId/addUser')}');
-    _logger.i('Request Body: ${json.encode({'userId': userId})}');
-    _logger.i('Response Status: ${response.statusCode}');
-    _logger.i('Response Body: ${response.body}');
-
-    return response;
-  } catch (e) {
-    _logger.e('Fout bij toevoegen gebruiker aan team: $e');
-    rethrow;
+      _logger.i('Gebruiker toegevoegd aan team: ${response.body}');
+      return response;
+    } catch (e) {
+      _logger.e('Fout bij toevoegen gebruiker aan team: $e');
+      rethrow;
+    }
   }
-}
 
+  // Methode om een gebruiker te verwijderen uit een team
+  Future<http.Response> removeUserFromTeam(int teamId, int userId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${baseUrl}teams/$teamId/removeUser'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (AuthService.authToken != null)
+            'Authorization': 'Bearer ${AuthService.authToken}',
+        },
+        body: json.encode({'userId': userId}),
+      );
 
-
-
-  // Maak een nieuw team
- // Maak een nieuw team
-Future<http.Response> createTeam(String name, String description) async {
-  try {
-    final response = await http.post(
-      Uri.parse('${baseUrl}teams'),
-      headers: {
-        'Content-Type': 'application/json',
-        if (AuthService.authToken != null)
-          'Authorization': 'Bearer ${AuthService.authToken}',
-      },
-      body: json.encode({
-        'name': name,
-        'description': description,
-        'metadata': {'Icon': 'calendar_today'},
-      }),
-    );
-
-    _logger.i('Team succesvol aangemaakt: ${response.body}');
-    return response;
-  } catch (e) {
-    _logger.e('Fout bij aanmaken team: $e');
-    rethrow;
+      _logger.i('Gebruiker verwijderd uit team: ${response.body}');
+      return response;
+    } catch (e) {
+      _logger.e('Fout bij verwijderen gebruiker: $e');
+      rethrow;
+    }
   }
-}
 
+  // Methode om een nieuw team aan te maken
+  Future<http.Response> createTeam(String name, String description) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${baseUrl}teams'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (AuthService.authToken != null)
+            'Authorization': 'Bearer ${AuthService.authToken}',
+        },
+        body: json.encode({
+          'name': name,
+          'description': description,
+        }),
+      );
 
-  // Haal alle teams op
+      _logger.i('Team succesvol aangemaakt: ${response.body}');
+      return response;
+    } catch (e) {
+      _logger.e('Fout bij aanmaken team: $e');
+      rethrow;
+    }
+  }
+
+  // Methode om alle teams op te halen
   Future<http.Response> getTeams() async {
     try {
       final response = await http.get(
@@ -125,6 +109,7 @@ Future<http.Response> createTeam(String name, String description) async {
             'Authorization': 'Bearer ${AuthService.authToken}',
         },
       );
+
       if (response.statusCode == 200) {
         _logger.i('Teams succesvol opgehaald: ${response.body}');
       } else {
@@ -137,25 +122,46 @@ Future<http.Response> createTeam(String name, String description) async {
     }
   }
 
-  // Verwijder een team
-  Future<http.Response> deleteTeam(int teamId) async {
+// Methode om een gebruiker admin te maken
+Future<http.Response> makeUserAdmin(int userId) async {
+  try {
+    final response = await http.post(
+      Uri.parse('${baseUrl}users/$userId/makeAdmin'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (AuthService.authToken != null)
+          'Authorization': 'Bearer ${AuthService.authToken}',
+      },
+    );
+
+    _logger.i('Gebruiker admin gemaakt: ${response.body}');
+    return response;
+  } catch (e) {
+    _logger.e('Fout bij het toekennen van admin-rechten: $e');
+    rethrow;
+  }
+}
+
+  // Methode om alle gebruikers op te halen
+  Future<http.Response> getAllUsers() async {
     try {
-      final response = await http.delete(
-        Uri.parse('${baseUrl}teams/$teamId'),
+      final response = await http.get(
+        Uri.parse('${baseUrl}users'),
         headers: {
-          'Accept': 'application/json',
+          'Content-Type': 'application/json',
           if (AuthService.authToken != null)
             'Authorization': 'Bearer ${AuthService.authToken}',
         },
       );
+
       if (response.statusCode == 200) {
-        _logger.i('Team succesvol verwijderd: $teamId');
+        _logger.i('Gebruikers succesvol opgehaald: ${response.body}');
       } else {
-        _logger.w('Fout bij verwijderen team $teamId: ${response.body}');
+        _logger.w('Fout bij ophalen gebruikers: ${response.body}');
       }
       return response;
     } catch (e) {
-      _logger.e('Fout bij verwijderen team $teamId: $e');
+      _logger.e('Fout bij ophalen gebruikers: $e');
       rethrow;
     }
   }

@@ -5,7 +5,7 @@ import 'package:cpd_flutterapp/services/auth_service.dart';
 import 'package:cpd_flutterapp/screens/home_page.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key}); // Using super.key instead of Key? key
+  const LoginScreen({super.key});
 
   @override
   LoginScreenState createState() => LoginScreenState();
@@ -21,26 +21,23 @@ class LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: Colors.white70,
       appBar: PreferredSize(
-        preferredSize:
-            const Size.fromHeight(60.0), // Set the height of the AppBar
+        preferredSize: const Size.fromHeight(60.0),
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(
-              color: const Color.fromARGB(255, 0, 0, 0), // Border color
-              width: 4.0, // Border thickness
+              color: const Color.fromARGB(255, 0, 0, 0),
+              width: 4.0,
             ),
             borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(10)), // Optional: Rounded corners
+              bottom: Radius.circular(10),
+            ),
           ),
           child: AppBar(
-            backgroundColor: Colors.grey, // Set background color of AppBar
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Text("Flutter App"),
-              ],
+            backgroundColor: Colors.grey,
+            title: const Center(
+              child: Text("Flutter App"),
             ),
-            elevation: 0, // Remove shadow
+            elevation: 0,
           ),
         ),
       ),
@@ -53,13 +50,13 @@ class LoginScreenState extends State<LoginScreen> {
               const Padding(
                 padding: EdgeInsets.only(bottom: 100.0),
                 child: Text(
-                  'Login Pagina', // Your H1 text
+                  'Login Pagina',
                   style: TextStyle(
-                    fontSize: 36, // H1 font size
-                    fontWeight: FontWeight.w300, // Bold text
-                    color: Colors.black, // Text color
+                    fontSize: 36,
+                    fontWeight: FontWeight.w300,
+                    color: Colors.black,
                   ),
-                  textAlign: TextAlign.center, // Center the text
+                  textAlign: TextAlign.center,
                 ),
               ),
               SizedBox(
@@ -69,25 +66,23 @@ class LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     labelText: 'Gebruikersnaam',
                     border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(20.0), // Rounded corners
+                      borderRadius: BorderRadius.circular(20.0),
                       borderSide: const BorderSide(
-                        color: Colors.black, // Border color
-                        width: 1.0, // Border thickness
+                        color: Colors.black,
+                        width: 1.0,
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(10.0), // Rounded corners
+                      borderRadius: BorderRadius.circular(10.0),
                       borderSide: const BorderSide(
-                        color: Colors.black, // Border color when focused
-                        width: 1.0, // Border thickness when focused
+                        color: Colors.black,
+                        width: 1.0,
                       ),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 70), // Margin of 35 pixels between fields
+              const SizedBox(height: 70),
               SizedBox(
                 width: 300,
                 child: TextField(
@@ -95,46 +90,46 @@ class LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     labelText: 'Wachtwoord',
                     border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(20.0), // Rounded corners
+                      borderRadius: BorderRadius.circular(20.0),
                       borderSide: const BorderSide(
-                        color: Colors.black, // Border color
-                        width: 1.0, // Border thickness
+                        color: Colors.black,
+                        width: 1.0,
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(10.0), // Rounded corners
+                      borderRadius: BorderRadius.circular(10.0),
                       borderSide: const BorderSide(
-                        color: Colors.black, // Border color when focused
-                        width: 1.0, // Border thickness when focused
+                        color: Colors.black,
+                        width: 1.0,
                       ),
                     ),
                   ),
-                  obscureText: true, // Verbergt de tekst die wordt ingevoerd
+                  obscureText: true,
                 ),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
                   bool registered = await _authService.registerUser(
-                      _usernameController.text, _passwordController.text);
+                    _usernameController.text,
+                    _passwordController.text,
+                  );
                   if (registered) {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const HomePage(teamId: 1), // Pas teamId aan indien nodig
+                        builder: (context) => const HomePage(teamId: 1),
                       ),
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Registratie mislukt')));
+                      const SnackBar(content: Text('Registratie mislukt')),
+                    );
                   }
                 },
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.white,
-                  backgroundColor:
-                      const Color.fromARGB(255, 143, 147, 150), // Text color
+                  backgroundColor: const Color.fromARGB(255, 143, 147, 150),
                 ),
                 child: const Text('Register'),
               ),
@@ -142,25 +137,27 @@ class LoginScreenState extends State<LoginScreen> {
               ElevatedButton(
                 onPressed: () async {
                   bool loggedIn = await _authService.loginUser(
-                      _usernameController.text, _passwordController.text);
+                    _usernameController.text,
+                    _passwordController.text,
+                  );
                   if (loggedIn) {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const HomePage(teamId: 1), // Pas teamId aan indien nodig
+                        builder: (context) => const HomePage(teamId: 1),
                       ),
                     );
                   } else {
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Inloggen mislukt')));
+                        const SnackBar(content: Text('Inloggen mislukt')),
+                      );
                     }
                   }
                 },
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.white,
-                  backgroundColor:
-                      const Color.fromARGB(255, 143, 147, 150), // Text color
+                  backgroundColor: const Color.fromARGB(255, 143, 147, 150),
                 ),
                 child: const Text('Login'),
               ),

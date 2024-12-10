@@ -3,14 +3,13 @@ import 'package:logger/logger.dart';
 import '../services/api_service.dart' as service;
 import '../services/auth_service.dart';
 import 'teams/teams_page.dart';
-import 'users_page.dart';
+import 'users_page.dart'; // Import voor gebruikers toevoegen
 import 'login/login_screen.dart';
 import 'profile_page.dart';
-import 'teams/team_details_page.dart';
 import 'dart:convert';
 
 class HomePage extends StatefulWidget {
-  final int teamId; // Team ID toegevoegd
+  final int teamId;
 
   const HomePage({super.key, required this.teamId});
 
@@ -134,17 +133,6 @@ class HomePageState extends State<HomePage> {
                 );
               },
               child: const Text('Gebruikers Toevoegen via Lijst'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TeamDetailsPage(teamId: widget.teamId),
-                  ),
-                );
-              },
-              child: const Text('Open Team Details'),
             ),
           ],
         ),
