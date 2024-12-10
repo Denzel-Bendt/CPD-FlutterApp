@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'services/api_service.dart';
-import 'services/auth_service.dart'; // Zorg dat AuthService wordt geïmporteerd
+import '../services/api_service.dart' as service;
+import '../services/auth_service.dart';
+import 'teams/teams_page.dart';
+import 'users_page.dart'; // Import voor gebruikers toevoegen
+import 'login/login_screen.dart';
+import 'profile_page.dart';
 import 'dart:convert';
-import 'teams_page.dart';
-import 'users_page.dart';
-import 'login_screen.dart';
-import 'profile_page.dart'; // Import de ProfilePage
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final int teamId;
+
+  const HomePage({super.key, required this.teamId});
 
   @override
   HomePageState createState() => HomePageState();
@@ -17,34 +19,38 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   final Logger logger = Logger();
-  final AuthService authService = AuthService(); // Maak een instantie van AuthService
+  final AuthService authService = AuthService();
+  final service.ApiService apiService = service.ApiService();
   final TextEditingController _teamNameController = TextEditingController();
   final TextEditingController _teamDescriptionController = TextEditingController();
 
   Future<void> _createTeam(BuildContext context) async {
-    ApiService apiService = ApiService();
-
     String teamName = _teamNameController.text;
     String teamDescription = _teamDescriptionController.text;
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
-    final response = await apiService.createTeam(teamName, teamDescription);
+    try {
+      final response = await apiService.createTeam(teamName, teamDescription);
+      logger.i('Response status: ${response.statusCode}');
+      logger.i('Response body: ${response.body}');
 
-    logger.i('Response status: ${response.statusCode}');
-    logger.i('Response body: ${response.body}');
-
-    if (context.mounted) {
       if (response.statusCode == 201) {
         var responseData = json.decode(response.body);
         var teamId = responseData['data']['id'];
 
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessenger.showSnackBar(
           SnackBar(content: Text('Team succesvol aangemaakt met ID: $teamId')),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessenger.showSnackBar(
           SnackBar(content: Text('Fout bij het aanmaken van team: ${response.body}')),
         );
       }
+    } catch (e) {
+      logger.e('Er is een fout opgetreden bij het aanmaken van het team: $e');
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(content: Text('Er is een fout opgetreden. Probeer het opnieuw.')),
+      );
     }
   }
 
@@ -62,10 +68,7 @@ class HomePageState extends State<HomePage> {
                   MaterialPageRoute(builder: (context) => const ProfilePage()),
                 );
               } else if (value == 'Logout') {
-                // Log de gebruiker uit
                 authService.logout();
-
-                // Navigeren naar het inlogscherm en alle eerdere schermen verwijderen
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const LoginScreen()),
                   (Route<dynamic> route) => false,
@@ -124,10 +127,12 @@ class HomePageState extends State<HomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const UsersPage()),
+                  MaterialPageRoute(
+                    builder: (context) => UsersPage(teamId: widget.teamId), // Correct teamId meegegeven
+                  ),
                 );
               },
-              child: const Text('Bekijk Gebruikers'),
+              child: const Text('Gebruikers Toevoegen via Lijst'),
             ),
           ],
         ),
