@@ -32,6 +32,15 @@ class ApiService {
     }
   }
 
+    Map<String, String> _buildHeaders() {
+    return {
+      'Content-Type': 'application/json',
+      if (AuthService.authToken != null)
+        'Authorization': 'Bearer ${AuthService.authToken}',
+    };
+  }
+
+
   // Methode om een gebruiker toe te voegen aan een team
   Future<http.Response> addUserToTeam(int teamId, int userId) async {
     try {
@@ -162,6 +171,55 @@ Future<http.Response> makeUserAdmin(int userId) async {
       return response;
     } catch (e) {
       _logger.e('Fout bij ophalen gebruikers: $e');
+      rethrow;
+    }
+  }
+
+  // Methode om een evenement te creëren
+  Future<http.Response> createEvent({
+    required String title,
+    required String description,
+    required String datetimeStart,
+    required String datetimeEnd,
+    required int teamId,
+    required Map<String, dynamic> location,
+    Map<String, dynamic>? metadata,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${baseUrl}events'),
+        headers: _buildHeaders(),
+        body: jsonEncode({
+          'title': title,
+          'description': description,
+          'datetimeStart': datetimeStart,
+          'datetimeEnd': datetimeEnd,
+          'teamId': teamId,
+          'location': location,
+          'metadata': metadata ?? {},
+        }),
+      );
+
+      _logger.i('Evenement aangemaakt: ${response.body}');
+      return response;
+    } catch (e) {
+      _logger.e('Fout bij aanmaken evenement: $e');
+      rethrow;
+    }
+  }
+
+  // Haal alle evenementen op
+  Future<http.Response> getAllEvents() async {
+    try {
+      final response = await http.get(
+        Uri.parse('${baseUrl}events'),
+        headers: _buildHeaders(),
+      );
+
+      _logger.i('Evenementen opgehaald: ${response.body}');
+      return response;
+    } catch (e) {
+      _logger.e('Fout bij ophalen evenementen: $e');
       rethrow;
     }
   }
