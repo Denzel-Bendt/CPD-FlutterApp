@@ -131,6 +131,21 @@ class ApiService {
     }
   }
 
+Future<http.Response> getTeamEvents(int teamId) async {
+  try {
+    final response = await http.get(
+      Uri.parse('${baseUrl}teams/$teamId/events'),
+      headers: _buildHeaders(),
+    );
+
+    _logger.i('Team evenementen succesvol opgehaald: ${response.body}');
+    return response;
+  } catch (e) {
+    _logger.e('Fout bij ophalen team evenementen: $e');
+    rethrow;
+  }
+}
+
 // Methode om een gebruiker admin te maken
 Future<http.Response> makeUserAdmin(int userId) async {
   try {
@@ -176,37 +191,61 @@ Future<http.Response> makeUserAdmin(int userId) async {
   }
 
   // Methode om een evenement te creëren
-  Future<http.Response> createEvent({
-    required String title,
-    required String description,
-    required String datetimeStart,
-    required String datetimeEnd,
-    required int teamId,
-    required Map<String, dynamic> location,
-    Map<String, dynamic>? metadata,
-  }) async {
-    try {
-      final response = await http.post(
-        Uri.parse('${baseUrl}events'),
-        headers: _buildHeaders(),
-        body: jsonEncode({
-          'title': title,
-          'description': description,
-          'datetimeStart': datetimeStart,
-          'datetimeEnd': datetimeEnd,
-          'teamId': teamId,
-          'location': location,
-          'metadata': metadata ?? {},
-        }),
-      );
-
-      _logger.i('Evenement aangemaakt: ${response.body}');
-      return response;
-    } catch (e) {
-      _logger.e('Fout bij aanmaken evenement: $e');
-      rethrow;
-    }
+ Future<http.Response> createEvent({
+  required String title,
+  required String description,
+  required String datetimeStart,
+  required String datetimeEnd,
+  required int teamId,
+  required Map<String, dynamic> location,
+}) async {
+  try {
+    final response = await http.post(
+      Uri.parse('${baseUrl}events'),
+      headers: _buildHeaders(),
+      body: jsonEncode({
+        'title': title,
+        'description': description,
+        'datetimeStart': datetimeStart,
+        'datetimeEnd': datetimeEnd,
+        'teamId': teamId,
+        'location': location,
+      }),
+    );
+    return response;
+  } catch (e) {
+    throw Exception('Fout bij aanmaken evenement: $e');
   }
+}
+
+
+Future<http.Response> updateEvent({
+  required int id,
+  required String title,
+  required String description,
+  required String datetimeStart,
+  required String datetimeEnd,
+  required Map<String, dynamic> location,
+}) async {
+  return await http.put(
+    Uri.parse('${baseUrl}events/$id'),
+    headers: _buildHeaders(),
+    body: jsonEncode({
+      'title': title,
+      'description': description,
+      'datetimeStart': datetimeStart,
+      'datetimeEnd': datetimeEnd,
+      'location': location,
+    }),
+  );
+}
+
+Future<http.Response> deleteEvent(int id) async {
+  return await http.delete(
+    Uri.parse('${baseUrl}events/$id'),
+    headers: _buildHeaders(),
+  );
+}
 
   // Haal alle evenementen op
   Future<http.Response> getAllEvents() async {

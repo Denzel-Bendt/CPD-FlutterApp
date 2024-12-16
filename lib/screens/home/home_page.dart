@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import '../services/api_service.dart' as service;
-import '../services/auth_service.dart';
-import 'teams/teams_page.dart';
-import 'users_page.dart'; // Import voor gebruikers toevoegen
-import 'login/login_screen.dart';
-import 'profile_page.dart';
-import 'events/events_page.dart';
+import '../../services/api_service.dart' as service;
+import '../../services/auth_service.dart';
+import '../teams/teams_page.dart';
+import '../users/users_page.dart'; // Import voor gebruikers toevoegen
+import '../login/login_screen.dart';
+import '../profile/profile_page.dart';
+import '../events/events_page.dart';
 import 'dart:convert';
 
 class HomePage extends StatefulWidget {
