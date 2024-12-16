@@ -6,6 +6,7 @@ import 'teams/teams_page.dart';
 import 'users_page.dart'; // Import voor gebruikers toevoegen
 import 'login/login_screen.dart';
 import 'profile_page.dart';
+import 'events/events_page.dart';
 import 'dart:convert';
 
 class HomePage extends StatefulWidget {
@@ -134,6 +135,16 @@ class HomePageState extends State<HomePage> {
               },
               child: const Text('Gebruikers Toevoegen via Lijst'),
             ),
+          ElevatedButton(
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const EventsPage()),
+    );
+  },
+  child: const Text('Bekijk Evenementen'),
+),
+
           ],
         ),
       ),

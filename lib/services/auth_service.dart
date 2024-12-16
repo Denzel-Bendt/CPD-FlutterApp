@@ -59,4 +59,19 @@ class AuthService {
     authToken = null; // Token wordt verwijderd
     _logger.i('Gebruiker is uitgelogd');
   }
+
+  // Controleer of een token geldig is
+  bool isTokenValid() {
+    if (authToken == null) return false;
+    try {
+      final payload = json.decode(
+          utf8.decode(base64Url.decode(base64Url.normalize(authToken!.split('.')[1]))));
+      final expiry = payload['exp'] as int;
+      final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      return expiry > now;
+    } catch (e) {
+      _logger.e('Token validatie mislukt: $e');
+      return false;
+    }
+  }
 }
