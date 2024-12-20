@@ -45,37 +45,38 @@ class EventsPageState extends State<EventsPage> {
     }
   }
 
- Future<void> _fetchEvents() async {
+Future<void> _fetchEvents() async {
+  if (_selectedTeamId == null) {
+    _showSnackBar('Selecteer eerst een team.');
+    return;
+  }
+
   setState(() {
     isLoading = true;
   });
 
   try {
-    final response = await _apiService.getAllEvents();
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body)['data'];
-      Map<DateTime, List<Map<String, dynamic>>> events = {};
+    final combinedEvents = await _apiService.getCombinedEvents(_selectedTeamId!);
 
-      for (var event in data) {
-        final DateTime date = DateTime.parse(event['datetimeStart']).toLocal();
-        events[DateTime(date.year, date.month, date.day)] ??= [];
-        events[DateTime(date.year, date.month, date.day)]!.add(event);
-      }
-
-      setState(() {
-        _events = events;
-        isLoading = false;
-      });
-    } else {
-      _showSnackBar('Fout bij ophalen evenementen: ${response.body}');
+    Map<DateTime, List<Map<String, dynamic>>> eventsByDate = {};
+    for (var event in combinedEvents) {
+      final DateTime date = DateTime.parse(event['datetimeStart']).toLocal();
+      eventsByDate[DateTime(date.year, date.month, date.day)] ??= [];
+      eventsByDate[DateTime(date.year, date.month, date.day)]!.add(event);
     }
+
+    setState(() {
+      _events = eventsByDate;
+      isLoading = false;
+    });
   } catch (e) {
-    _showSnackBar('Fout: $e');
+    _showSnackBar('Fout bij ophalen gecombineerde evenementen: $e');
     setState(() {
       isLoading = false;
     });
   }
 }
+
 
 
  Future<void> _addEvent(String title) async {
