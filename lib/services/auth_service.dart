@@ -6,6 +6,7 @@ class AuthService {
   final String baseUrl = 'https://team-management-api.dops.tech/api/v2';
   final Logger _logger = Logger();
   static String? authToken; // Token wordt hier opgeslagen
+  static String? username; // Gebruikersnaam wordt hier opgeslagen
 
   // Methode om een nieuwe gebruiker te registreren
   Future<bool> registerUser(String name, String password) async {
@@ -41,6 +42,7 @@ class AuthService {
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         authToken = responseData['data']['token'];
+        username = name; // Gebruikersnaam instellen
         _logger.i('Token opgeslagen: $authToken'); // Debug token
         _logger.i('Inloggen succesvol voor gebruiker: $name');
         return true;
@@ -57,7 +59,26 @@ class AuthService {
   // Methode om uit te loggen
   void logout() {
     authToken = null; // Token wordt verwijderd
+    username = null; // Gebruikersnaam wordt verwijderd
     _logger.i('Gebruiker is uitgelogd');
+  }
+
+  Future<Map<String, dynamic>?> getUserProfile() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/users/me'),
+        headers: _buildHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body)['data'];
+      } else {
+        throw Exception('Kan gebruikersprofiel niet ophalen');
+      }
+    } catch (e) {
+      _logger.e('Fout bij ophalen gebruikersprofiel: $e');
+      rethrow;
+    }
   }
 
   // Controleer of een token geldig is
@@ -73,5 +94,13 @@ class AuthService {
       _logger.e('Token validatie mislukt: $e');
       return false;
     }
+  }
+
+  // Helper methode om headers op te bouwen
+  Map<String, String> _buildHeaders() {
+    return {
+      'Content-Type': 'application/json',
+      if (authToken != null) 'Authorization': 'Bearer $authToken',
+    };
   }
 }
