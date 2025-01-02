@@ -1,25 +1,21 @@
-import 'package:cpd_flutterapp/screens/events/eventss_page.dart';
-import 'package:cpd_flutterapp/screens/matches/matches_page.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import '../../services/api_service.dart' as service;
 import '../../services/auth_service.dart';
-import '../teams/teams_start_page.dart';
 import '../login/login_screen.dart';
 import '../profile/profile_page.dart';
-// import '../events/events_page.dart';
 import 'dart:convert';
 
-class HomePage extends StatefulWidget {
-  final int teamId;
+class TeamAddPage extends StatefulWidget {
+  final int? teamId;
 
-  const HomePage({super.key, required this.teamId});
+  const TeamAddPage({super.key, required this.teamId});
 
   @override
-  HomePageState createState() => HomePageState();
+  TeamAddPageState createState() => TeamAddPageState();
 }
 
-class HomePageState extends State<HomePage> {
+class TeamAddPageState extends State<TeamAddPage> {
   final Logger logger = Logger();
   final AuthService authService = AuthService();
   final service.ApiService apiService = service.ApiService();
@@ -101,55 +97,25 @@ class HomePageState extends State<HomePage> {
               'Welkom Username #000!', // Welkom Teamsync!!
               style: TextStyle(fontSize: 24),
             ),
-            // const SizedBox(height: 20), // Dit uitgecomment omdat ik dit van die homepage wil en ga verplaatsen naar teams pagina
-            // TextField(
-            //   controller: _teamNameController,
-            //   decoration: const InputDecoration(
-            //     labelText: 'Voer Teamnaam in',
-            //   ),
-            // ),
-            // const SizedBox(height: 20),
-            // TextField(
-            //   controller: _teamDescriptionController,
-            //   decoration: const InputDecoration(
-            //     labelText: 'Voer Teambeschrijving in',
-            //   ),
-            // ),
-            // const SizedBox(height: 20),
-            // ElevatedButton(
-            //   onPressed: () => _createTeam(context),
-            //   child: const Text('Maak Team'),
-            // ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const TeamsStartPage()),
-                );
-              },
-              child: const Text('Teams'),
+            const SizedBox(height: 20),
+            TextField(
+              controller: _teamNameController,
+              decoration: const InputDecoration(
+                labelText:
+                    'Voer Teamnaam in', //invoer voor het aanmaken van een team
+              ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        MatchesPage(), // Correct teamId meegegeven
-                  ),
-                );
-              },
-              child: const Text('Matches'),
+            const SizedBox(height: 20),
+            TextField(
+              controller: _teamDescriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Voer Teambeschrijving in',
+              ),
             ),
+            const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const EventssPage()));
-              },
-              child: const Text('Evenementen'),
+              onPressed: () => _createTeam(context),
+              child: const Text('Maak Team'), // Tot hier met de button daarvoor
             ),
           ],
         ),

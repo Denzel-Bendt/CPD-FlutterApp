@@ -19,21 +19,21 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white70,
+      backgroundColor: const Color.fromARGB(248, 255, 255, 255),
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60.0),
+        preferredSize: const Size.fromHeight(30.0),
         child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color.fromARGB(255, 0, 0, 0),
-              width: 4.0,
-            ),
-            borderRadius: const BorderRadius.vertical(
-              bottom: Radius.circular(10),
-            ),
-          ),
+          // decoration: BoxDecoration(
+          //   border: Border.all(
+          //     color: const Color.fromARGB(255, 0, 0, 0),
+          //     width: 4.0,
+          //   ),
+          //   borderRadius: const BorderRadius.vertical(
+          //     bottom: Radius.circular(10),
+          //   ),
+          // ),
           child: AppBar(
-            backgroundColor: Colors.grey,
+            backgroundColor: const Color(0x333 ),
             title: const Center(
               child: Text("Flutter App"),
             ),

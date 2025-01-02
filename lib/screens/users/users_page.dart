@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cpd_flutterapp/services/api_service.dart';
-
-
+// Is een lijst van alle gebruikers
 
 class UsersPage extends StatefulWidget {
   final int teamId;
