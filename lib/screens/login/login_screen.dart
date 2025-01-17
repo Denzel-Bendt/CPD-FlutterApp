@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:cpd_flutterapp/services/auth_service.dart';
 import 'package:cpd_flutterapp/screens/home/home_page.dart';
+import 'package:http/http.dart' as http;  // Importeer de http package
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,9 +13,17 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
-  final AuthService _authService = AuthService();
+  late final AuthService _authService;  // Maak de AuthService late initialisatie
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Maak een instantie van de http.Client en geef deze door aan de AuthService
+    final http.Client client = http.Client();
+    _authService = AuthService(client: client);  // AuthService wordt geïnitialiseerd met de client
+  }
 
   @override
   Widget build(BuildContext context) {

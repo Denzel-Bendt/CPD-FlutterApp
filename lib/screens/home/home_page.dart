@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:http/http.dart' as http;
 import '../../services/api_service.dart' as service;
-import '../../services/auth_service.dart';
+import '../../services/auth_service.dart';  // Zorg ervoor dat je de AuthService importeert
 import '../teams/teams_page.dart';
-import '../users/users_page.dart'; // Import voor gebruikers toevoegen
+import '../users/users_page.dart';
 import '../login/login_screen.dart';
 import '../profile/profile_page.dart';
 import '../events/events_page.dart';
@@ -20,10 +21,18 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   final Logger logger = Logger();
-  final AuthService authService = AuthService();
+  late final AuthService authService; // Declareer authService als late initialisatie
   final service.ApiService apiService = service.ApiService();
   final TextEditingController _teamNameController = TextEditingController();
   final TextEditingController _teamDescriptionController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Maak een instantie van de http.Client en geef deze door aan de AuthService constructor
+    final http.Client client = http.Client();
+    authService = AuthService(client: client);
+  }
 
   Future<void> _createTeam(BuildContext context) async {
     String teamName = _teamNameController.text;
@@ -135,16 +144,15 @@ class HomePageState extends State<HomePage> {
               },
               child: const Text('Gebruikers Toevoegen via Lijst'),
             ),
-          ElevatedButton(
-  onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const EventsPage()),
-    );
-  },
-  child: const Text('Bekijk Evenementen'),
-),
-
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const EventsPage()),
+                );
+              },
+              child: const Text('Bekijk Evenementen'),
+            ),
           ],
         ),
       ),

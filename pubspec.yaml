@@ -14,11 +14,15 @@ dependencies:
   cupertino_icons: ^1.0.7
   logger: ^1.1.0
   table_calendar: ^3.0.8
+  logging: ^1.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  mockito: ^5.3.2
+  build_runner: ^2.3.3
+  
 
 flutter:
   uses-material-design: true
