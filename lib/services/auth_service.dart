@@ -7,11 +7,16 @@ class AuthService {
   final Logger _logger = Logger();
   static String? authToken; // Token wordt hier opgeslagen
   static String? username; // Gebruikersnaam wordt hier opgeslagen
+  final http.Client client; // Voeg client toe als parameter
+
+  // Constructor met client parameter
+ AuthService({http.Client? client})
+      : client = client ?? http.Client();
 
   // Methode om een nieuwe gebruiker te registreren
   Future<bool> registerUser(String name, String password) async {
     try {
-      var response = await http.post(
+      var response = await client.post(
         Uri.parse('$baseUrl/auth/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'name': name, 'password': password}),
@@ -33,7 +38,7 @@ class AuthService {
   // Methode om een gebruiker in te loggen
   Future<bool> loginUser(String name, String password) async {
     try {
-      var response = await http.post(
+      var response = await client.post(
         Uri.parse('$baseUrl/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'name': name, 'password': password}),
@@ -65,7 +70,7 @@ class AuthService {
 
   Future<Map<String, dynamic>?> getUserProfile() async {
     try {
-      final response = await http.get(
+      final response = await client.get(
         Uri.parse('$baseUrl/users/me'),
         headers: _buildHeaders(),
       );

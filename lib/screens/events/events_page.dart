@@ -1,9 +1,10 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'dart:convert';
 import 'package:cpd_flutterapp/services/api_service.dart';
+import 'package:logging/logging.dart';
+
+final Logger _logger = Logger('EventsPage');
 
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
@@ -15,8 +16,8 @@ class EventsPage extends StatefulWidget {
 class EventsPageState extends State<EventsPage> {
   final ApiService _apiService = ApiService();
   Map<DateTime, List<Map<String, dynamic>>> _events = {};
-  List<dynamic> _teams = []; // Teams ophalen
-  int? _selectedTeamId; // Geselecteerd team
+  List<dynamic> _teams = [];
+  int? _selectedTeamId;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   bool isLoading = true;
@@ -24,13 +25,16 @@ class EventsPageState extends State<EventsPage> {
   @override
   void initState() {
     super.initState();
-    _fetchTeams(); // Teams ophalen
-    _fetchEvents(); // Evenementen ophalen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchTeams();
+      _fetchEvents();
+    });
   }
 
   Future<void> _fetchTeams() async {
     try {
       final response = await _apiService.getTeams();
+      _logger.info('Teams response: ${response.body}');
       if (response.statusCode == 200) {
         final data = json.decode(response.body)['data'];
         setState(() {
@@ -39,47 +43,57 @@ class EventsPageState extends State<EventsPage> {
         });
       } else {
         _showSnackBar('Fout bij ophalen teams: ${response.body}');
+        _logger.warning('Fout bij ophalen teams: ${response.body}');
       }
     } catch (e) {
       _showSnackBar('Fout bij ophalen teams: $e');
+      _logger.severe('Fout bij ophalen teams', e);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
-Future<void> _fetchEvents() async {
-  if (_selectedTeamId == null) {
-    _showSnackBar('Selecteer eerst een team.');
-    return;
-  }
-
-  setState(() {
-    isLoading = true;
-  });
-
-  try {
-    final combinedEvents = await _apiService.getCombinedEvents(_selectedTeamId!);
-
-    Map<DateTime, List<Map<String, dynamic>>> eventsByDate = {};
-    for (var event in combinedEvents) {
-      final DateTime date = DateTime.parse(event['datetimeStart']).toLocal();
-      eventsByDate[DateTime(date.year, date.month, date.day)] ??= [];
-      eventsByDate[DateTime(date.year, date.month, date.day)]!.add(event);
+  Future<void> _fetchEvents() async {
+    if (_selectedTeamId == null) {
+      _showSnackBar('Selecteer eerst een team.');
+      _logger.warning('Geen team geselecteerd bij het ophalen van evenementen.');
+      setState(() {
+        isLoading = false;
+      });
+      return;
     }
 
     setState(() {
-      _events = eventsByDate;
-      isLoading = false;
+      isLoading = true;
     });
-  } catch (e) {
-    _showSnackBar('Fout bij ophalen gecombineerde evenementen: $e');
-    setState(() {
-      isLoading = false;
-    });
+
+    try {
+      final combinedEvents = await _apiService.getCombinedEvents(_selectedTeamId!);
+      _logger.info('Events response: $combinedEvents');
+
+      Map<DateTime, List<Map<String, dynamic>>> eventsByDate = {};
+      for (var event in combinedEvents) {
+        final DateTime date = DateTime.parse(event['datetimeStart']).toLocal();
+        eventsByDate[DateTime(date.year, date.month, date.day)] ??= [];
+        eventsByDate[DateTime(date.year, date.month, date.day)]!.add(event);
+      }
+
+      setState(() {
+        _events = eventsByDate;
+      });
+    } catch (e) {
+      _showSnackBar('Fout bij ophalen gecombineerde evenementen: $e');
+      _logger.severe('Fout bij ophalen gecombineerde evenementen', e);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
-}
 
-
-
- Future<void> _addEvent(String title) async {
+  Future<void> _addEvent(String title) async {
   if (_selectedTeamId == null) {
     _showSnackBar('Selecteer eerst een team.');
     return;
@@ -99,7 +113,20 @@ Future<void> _fetchEvents() async {
 
     if (response.statusCode == 201) {
       _showSnackBar('Evenement succesvol toegevoegd!');
-      _fetchEvents(); // Vernieuw evenementenlijst
+      
+      // Direct toevoegen aan lokale _events map
+      final newEvent = {
+        'id': json.decode(response.body)['id'], // Zorg dat dit de juiste ID is
+        'title': title,
+        'description': 'Automatisch toegevoegd evenement',
+        'datetimeStart': startTime.toIso8601String(),
+        'datetimeEnd': endTime.toIso8601String(),
+      };
+
+      setState(() {
+        _events[DateTime(startTime.year, startTime.month, startTime.day)] ??= [];
+        _events[DateTime(startTime.year, startTime.month, startTime.day)]!.add(newEvent);
+      });
     } else {
       _showSnackBar('Fout bij toevoegen evenement: ${response.body}');
     }
@@ -116,9 +143,11 @@ Future<void> _fetchEvents() async {
         _fetchEvents();
       } else {
         _showSnackBar('Fout bij verwijderen evenement: ${response.body}');
+        _logger.warning('Fout bij verwijderen evenement: ${response.body}');
       }
     } catch (e) {
       _showSnackBar('Fout: $e');
+      _logger.severe('Fout bij verwijderen evenement', e);
     }
   }
 
@@ -140,9 +169,11 @@ Future<void> _fetchEvents() async {
         _fetchEvents();
       } else {
         _showSnackBar('Fout bij bewerken evenement: ${response.body}');
+        _logger.warning('Fout bij bewerken evenement: ${response.body}');
       }
     } catch (e) {
       _showSnackBar('Fout: $e');
+      _logger.severe('Fout bij bewerken evenement', e);
     }
   }
 
@@ -177,24 +208,24 @@ Future<void> _fetchEvents() async {
                   onChanged: (value) {
                     setState(() {
                       _selectedTeamId = value;
+                      _fetchEvents();
                     });
                   },
                   hint: const Text('Selecteer een team'),
                 ),
-               TableCalendar(
-  focusedDay: _focusedDay,
-  firstDay: DateTime(2000),
-  lastDay: DateTime(2100),
-  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-  eventLoader: (day) => _getEventsForDay(day),
-  onDaySelected: (selectedDay, focusedDay) {
-    setState(() {
-      _selectedDay = selectedDay;
-      _focusedDay = focusedDay;
-    });
-  },
-),
-
+                TableCalendar(
+                  focusedDay: _focusedDay,
+                  firstDay: DateTime(2000),
+                  lastDay: DateTime(2100),
+                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                  eventLoader: (day) => _getEventsForDay(day),
+                  onDaySelected: (selectedDay, focusedDay) {
+                    setState(() {
+                      _selectedDay = selectedDay;
+                      _focusedDay = focusedDay;
+                    });
+                  },
+                ),
                 Expanded(
                   child: ListView.builder(
                     itemCount: _getEventsForDay(_selectedDay ?? _focusedDay).length,
