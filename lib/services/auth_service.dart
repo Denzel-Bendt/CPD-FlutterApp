@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:logger/logger.dart';
 
 class AuthService {
-  final String baseUrl = 'https://team-management-api.dops.tech/api/v2';
+  final String baseUrl = 'https://team-management-api.weensum.nl/api/v2';
   final Logger _logger = Logger();
   static String? authToken; // Token wordt hier opgeslagen
   static String? username; // Gebruikersnaam wordt hier opgeslagen

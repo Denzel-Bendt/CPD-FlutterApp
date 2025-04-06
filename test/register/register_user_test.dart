@@ -34,7 +34,7 @@ void main() {
     });
 
     test('Registers user successfully with valid data', () async {
-      final url = Uri.parse('https://team-management-api.dops.tech/api/v2/auth/register');
+      final url = Uri.parse('https://team-management-api.weensum.nl/api/v2/auth/register');
       final mockResponse = http.Response('', 201); // Simuleer succesvolle registratie
 
       // Voeg de mock-response toe
@@ -48,7 +48,7 @@ void main() {
     });
 
     test('Fails to register user with invalid data', () async {
-      final url = Uri.parse('https://team-management-api.dops.tech/api/v2/auth/register');
+      final url = Uri.parse('https://team-management-api.weensum.nl/api/v2/auth/register');
       final mockResponse = http.Response('{"error": "Invalid data"}', 400); // Simuleer mislukte registratie
 
       // Voeg de mock-response toe

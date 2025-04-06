@@ -1,9 +1,7 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:cpd_flutterapp/services/auth_service.dart';
 import 'package:cpd_flutterapp/screens/home/home_page.dart';
-import 'package:http/http.dart' as http;  // Importeer de http package
+import 'package:http/http.dart' as http;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,165 +11,112 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
-  late final AuthService _authService;  // Maak de AuthService late initialisatie
+  late final AuthService _authService;
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // Maak een instantie van de http.Client en geef deze door aan de AuthService
     final http.Client client = http.Client();
-    _authService = AuthService(client: client);  // AuthService wordt geïnitialiseerd met de client
+    _authService = AuthService(client: client);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white70,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60.0),
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color.fromARGB(255, 0, 0, 0),
-              width: 4.0,
-            ),
-            borderRadius: const BorderRadius.vertical(
-              bottom: Radius.circular(10),
-            ),
-          ),
-          child: AppBar(
-            backgroundColor: Colors.grey,
-            title: const Center(
-              child: Text("Flutter App"),
-            ),
-            elevation: 0,
-          ),
-        ),
-      ),
+      backgroundColor: Colors.white,
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Padding(
-                padding: EdgeInsets.only(bottom: 100.0),
-                child: Text(
-                  'Login Pagina',
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.w300,
-                    color: Colors.black,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'Flutter App',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
-              SizedBox(
-                width: 300,
-                child: TextField(
-                  controller: _usernameController,
-                  decoration: InputDecoration(
-                    labelText: 'Gebruikersnaam',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                        width: 1.0,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                        width: 1.0,
-                      ),
-                    ),
+            ),
+            const SizedBox(height: 40),
+            const Text(
+              'Login Pagina',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
+            const SizedBox(height: 40),
+            SizedBox(
+              width: 300,
+              child: TextField(
+                controller: _usernameController,
+                decoration: InputDecoration(
+                  labelText: 'Gebruikersnaam',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),
               ),
-              const SizedBox(height: 70),
-              SizedBox(
-                width: 300,
-                child: TextField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(
-                    labelText: 'Wachtwoord',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                        width: 1.0,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                        width: 1.0,
-                      ),
-                    ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: 300,
+              child: TextField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Wachtwoord',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
                   ),
-                  obscureText: true,
                 ),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  bool registered = await _authService.registerUser(
-                    _usernameController.text,
-                    _passwordController.text,
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () async {
+                bool loggedIn = await _authService.loginUser(
+                  _usernameController.text,
+                  _passwordController.text,
+                );
+                if (loggedIn) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomePage(teamId: 1),
+                    ),
                   );
-                  if (registered) {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const HomePage(teamId: 1),
-                      ),
-                    );
-                  } else {
+                } else {
+                  if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Registratie mislukt')),
+                      const SnackBar(content: Text('Inloggen mislukt')),
                     );
                   }
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: const Color.fromARGB(255, 143, 147, 150),
-                ),
-                child: const Text('Register'),
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(200, 50),
+                backgroundColor: const Color.fromRGBO(33, 150, 243, 1),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  bool loggedIn = await _authService.loginUser(
-                    _usernameController.text,
-                    _passwordController.text,
-                  );
-                  if (loggedIn) {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const HomePage(teamId: 1),
-                      ),
-                    );
-                  } else {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Inloggen mislukt')),
-                      );
-                    }
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: const Color.fromARGB(255, 143, 147, 150),
-                ),
-                child: const Text('Login'),
+              child: const Text(
+                'Login',
+                style: TextStyle(fontSize: 18),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 20),
+            TextButton(
+              onPressed: () {
+                // Add navigation to registration page
+              },
+              child: const Text(
+                'Registered',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.blue,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

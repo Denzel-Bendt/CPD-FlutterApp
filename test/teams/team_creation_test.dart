@@ -12,7 +12,7 @@ void main() {
 
     test('Successfully creates a team', () async {
       // Mock API-url en response
-      final url = Uri.parse('https://team-management-api.dops.tech/api/v2/teams');
+      final url = Uri.parse('https://team-management-api.weensum.nl/api/v2/teams');
       final mockResponse = http.Response('{"message": "Team aangemaakt"}', 201);
 
       // Voeg de mock-response toe
