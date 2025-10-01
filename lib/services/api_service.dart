@@ -4,7 +4,7 @@ import 'package:logger/logger.dart';
 import 'auth_service.dart';
 
 class ApiService {
-  final String baseUrl = 'https://team-management-api.weensum.nl/api/v2/auth/login';
+  final String baseUrl = 'https://team-managment-api.dendrowen.com/api/v2/';
   final Logger _logger = Logger();
 
   // Methode om headers op te bouwen

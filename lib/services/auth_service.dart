@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:logger/logger.dart';
 
 class AuthService {
-  final String baseUrl = 'https://team-management-api.weensum.nl/api/v2';
+  final String baseUrl = 'https://team-managment-api.dendrowen.com/api/v2';
   final Logger _logger = Logger();
   static String? authToken; // Token wordt hier opgeslagen
   static String? username; // Gebruikersnaam wordt hier opgeslagen
@@ -43,6 +43,9 @@ class AuthService {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'name': name, 'password': password}),
       );
+
+      print('Response status: ${response.statusCode}'); // Debug status code
+      print('Response body: ${response.body}'); // Debug response body
 
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
