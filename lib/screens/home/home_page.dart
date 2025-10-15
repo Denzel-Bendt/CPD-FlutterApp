@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:http/http.dart' as http;
 import '../../services/api_service.dart' as service;
-import '../../services/auth_service.dart';  // Zorg ervoor dat je de AuthService importeert
+import '../../services/auth_service.dart';
 import '../teams/teams_page.dart';
 import '../users/users_page.dart';
 import '../login/login_screen.dart';
 import '../profile/profile_page.dart';
 import '../events/events_page.dart';
+import '../teams/teams_homepage.dart';
+import '../matches/matches_page.dart';
+import '../events/events_homepage.dart'; 
 import 'dart:convert';
 
 class HomePage extends StatefulWidget {
@@ -21,7 +24,7 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   final Logger logger = Logger();
-  late final AuthService authService; // Declareer authService als late initialisatie
+  late final AuthService authService;
   final service.ApiService apiService = service.ApiService();
   final TextEditingController _teamNameController = TextEditingController();
   final TextEditingController _teamDescriptionController = TextEditingController();
@@ -29,7 +32,6 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    // Maak een instantie van de http.Client en geef deze door aan de AuthService constructor
     final http.Client client = http.Client();
     authService = AuthService(client: client);
   }
@@ -105,45 +107,79 @@ class HomePageState extends State<HomePage> {
               'Welkom bij TeamSync!',
               style: TextStyle(fontSize: 24),
             ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: _teamNameController,
-              decoration: const InputDecoration(
-                labelText: 'Voer Teamnaam in',
-              ),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: _teamDescriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Voer Teambeschrijving in',
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => _createTeam(context),
-              child: const Text('Maak Team'),
-            ),
+            // const SizedBox(height: 20),
+            // TextField(
+            //   controller: _teamNameController,
+            //   decoration: const InputDecoration(
+            //     labelText: 'Voer Teamnaam in',
+            //   ),
+            // ),
+            // const SizedBox(height: 20),
+            // TextField(
+            //   controller: _teamDescriptionController,
+            //   decoration: const InputDecoration(
+            //     labelText: 'Voer Teambeschrijving in',
+            //   ),
+            // ),
+            // const SizedBox(height: 20),
+            // ElevatedButton(
+            //   onPressed: () => _createTeam(context),
+            //   child: const Text('Maak Team'),
+            // ),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(builder: (context) => const TeamsPage()),
+            //     );
+            //   },
+            //   child: const Text('Bekijk Teams'),
+            // ),
+            // // Nieuwe knoppen toegevoegd
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const TeamsPage()),
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const TeamsHomePage()), // Vervang door je teamshomepage
                 );
               },
-              child: const Text('Bekijk Teams'),
+              child: const Text('Teams'),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => UsersPage(teamId: widget.teamId), // Correct teamId meegegeven
-                  ),
+                      builder: (context) =>
+                          const MatchesPage()), // Vervang door je matchespage
                 );
               },
-              child: const Text('Gebruikers Toevoegen via Lijst'),
+              child: const Text('Matches'),
             ),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //           builder: (context) =>
+            //               const EventsHomePage()), // Vervang door je evenementen homepage
+            //     );
+            //   },
+            //   child: const Text('Evenementen Homepage'),
+            // ),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //         builder: (context) => UsersPage(teamId: widget.teamId),
+            //       ),
+            //     );
+            //   },
+            //   child: const Text('Gebruikers Toevoegen via Lijst'),
+            // ),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -151,7 +187,7 @@ class HomePageState extends State<HomePage> {
                   MaterialPageRoute(builder: (context) => const EventsPage()),
                 );
               },
-              child: const Text('Bekijk Evenementen'),
+              child: const Text('Evenementen'),
             ),
           ],
         ),
