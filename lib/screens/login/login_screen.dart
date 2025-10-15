@@ -14,6 +14,7 @@ class LoginScreenState extends State<LoginScreen> {
   late final AuthService _authService;
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _rememberMe = false;
 
   @override
   void initState() {
@@ -26,97 +27,157 @@ class LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'Flutter App',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 40),
-            const Text(
-              'Login Pagina',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w300,
-              ),
-            ),
-            const SizedBox(height: 40),
-            SizedBox(
-              width: 300,
-              child: TextField(
-                controller: _usernameController,
-                decoration: InputDecoration(
-                  labelText: 'Gebruikersnaam',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: 300,
-              child: TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Wachtwoord',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () async {
-                bool loggedIn = await _authService.loginUser(
-                  _usernameController.text,
-                  _passwordController.text,
-                );
-                if (loggedIn) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const HomePage(teamId: 1),
-                    ),
-                  );
-                } else {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Inloggen mislukt')),
-                    );
-                  }
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(200, 50),
-                backgroundColor: const Color.fromRGBO(33, 150, 243, 1),
-              ),
-              child: const Text(
-                'Login',
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
-            const SizedBox(height: 20),
-            TextButton(
-              onPressed: () {
-                // Add navigation to registration page
-              },
-              child: const Text(
-                'Registered',
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 40.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const Text(
+                'Welkom bij Teamsync',
                 style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.blue,
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 120),
+              const Text(
+                'Gebruikersnaam',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 5),
+              SizedBox(
+                width: 480,
+                child: TextField(
+                  controller: _usernameController,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: const Color.fromARGB(255, 240, 240, 240),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(31.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                            color: Color(0xFF336791), width: 2.0),
+                        borderRadius: BorderRadius.circular(31.0)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Wachtwoord',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 5),
+              SizedBox(
+                width: 480,
+                child: TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: const Color.fromARGB(255, 240, 240, 240),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(31.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                            color: Color(0xFF336791), width: 2.0),
+                        borderRadius: BorderRadius.circular(31.0)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 30),
+              
+              SizedBox(
+                width: 480,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Linkerkant: "Herinner mij" met checkbox
+                    Row(
+                      children: [
+                        Theme(
+                          data: ThemeData(
+                            checkboxTheme: CheckboxThemeData(
+                              fillColor:
+                                  MaterialStateProperty.resolveWith<Color?>(
+                                (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.selected)) {
+                                    return const Color(
+                                        0xFF336791); // ← Geselecteerde kleur
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                          child: Checkbox(
+                            value: _rememberMe,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                _rememberMe = value ?? false;
+                              });
+                            },
+                          ),
+                        ),
+                        const Text(
+                          'Herinner mij',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Color.fromARGB(255, 2, 3, 4),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // Rechterkant: Login knop
+                    ElevatedButton(
+                      onPressed: () async {
+                        bool loggedIn = await _authService.loginUser(
+                          _usernameController.text,
+                          _passwordController.text,
+                        );
+                        if (loggedIn) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HomePage(teamId: 1),
+                            ),
+                          );
+                        } else {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Inloggen mislukt')),
+                            );
+                          }
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(260, 50),
+                        backgroundColor: const Color(0xFF336791),
+                      ),
+                      child: const Text(
+                        'Login',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
