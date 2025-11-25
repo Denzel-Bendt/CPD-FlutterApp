@@ -3,14 +3,11 @@ import 'package:logger/logger.dart';
 import 'package:http/http.dart' as http;
 import '../../services/api_service.dart' as service;
 import '../../services/auth_service.dart';
-import '../teams/teams_page.dart';
-import '../users/users_page.dart';
 import '../login/login_screen.dart';
 import '../profile/profile_page.dart';
 import '../events/events_page.dart';
 import '../teams/teams_homepage.dart';
 import '../matches/matches_page.dart';
-import '../events/events_homepage.dart'; 
 import 'dart:convert';
 
 class HomePage extends StatefulWidget {
